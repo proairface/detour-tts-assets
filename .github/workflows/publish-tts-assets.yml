@@ -1,0 +1,117 @@
+name: Publish TTS voice + runtime assets
+
+# Mirrors the binary assets Detour's on-device neural voice feature needs — the sherpa-onnx
+# Android runtime (Apache-2.0) and two Piper voice models (MIT) — onto this repo's own GitHub
+# Releases, rather than having the app or Detour's build fetch them from GitHub's and Hugging
+# Face's CDNs directly. This repo exists (separate from the private detour repo) specifically so
+# these release-asset URLs are fetchable without authentication — see README.md. Every file is
+# checked against a SHA-256 pinned in this workflow, not trusted blindly: the checksums below
+# were computed by hand from a real download and cross-checked against the Content-Length each
+# upstream host reported for the same URL before this workflow was ever written; a mismatch
+# fails the job outright rather than publishing something silently different from what was
+# verified.
+#
+# There is no sherpa-onnx Maven artifact to depend on directly (confirmed: a Maven Central search
+# for `com.k2fsa.sherpa.onnx` returns zero results) — k2-fsa distributes a prebuilt Android AAR
+# only as a GitHub Release asset. This workflow re-publishes that exact AAR, pinned to the
+# specific release tag and SHA-256 below, as Detour's own dependency instead of its build or its
+# users fetching a third party's release page directly.
+#
+# Manual trigger only, not on every push: these files are essentially immutable once a voice is
+# chosen (see docs/PROJECT-STATE.md in the detour repo for that decision) — nothing here benefits
+# from running automatically. Re-running this workflow re-publishes the same fixed tag — safe to
+# do again if a URL or checksum ever needs updating.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # sherpa-onnx Android runtime — Apache-2.0. No Maven Central artifact exists for it (verified
+  # via a direct Maven Central search API query, not assumed from a blog post); this is the
+  # project's own prebuilt AAR from its GitHub Release page.
+  SHERPA_ONNX_URL: https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.13.8/sherpa-onnx-1.13.8.aar
+  SHERPA_ONNX_SHA256: 633c24321e06b1fe79feafa03ea16cbc0f8a286641e2da3559bac91bdb13bd96
+  # Piper voices — MIT (rhasspy/piper-voices on Hugging Face; note this is a separate license
+  # from the now-GPL-3.0 piper1-gpl *code* repo — the model weights were never relicensed).
+  # English: highest quality tier Piper publishes for en_US ("high" — Dutch has no high tier).
+  EN_VOICE_ONNX_URL: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx
+  EN_VOICE_ONNX_SHA256: b3990d7606e183ec8dbfba70a4607074f162de1a0c412e0180d1ff60bb154eca
+  EN_VOICE_JSON_URL: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx.json
+  EN_VOICE_JSON_SHA256: c6d3b98f08315cb4bebf0d49d50fc4ff491b503c64b940cd3d5ca28543b48011
+  # Dutch: medium is Piper's ceiling for nl_NL — no high tier exists for Dutch as of this
+  # writing (confirmed against the project's own VOICES.md, not assumed).
+  NL_VOICE_ONNX_URL: https://huggingface.co/rhasspy/piper-voices/resolve/main/nl/nl_NL/mls/medium/nl_NL-mls-medium.onnx
+  NL_VOICE_ONNX_SHA256: 88312e0fbf505b87caf2373d94c1384892e86b1bf2ee482cf65dc8ba179cc7d3
+  NL_VOICE_JSON_URL: https://huggingface.co/rhasspy/piper-voices/resolve/main/nl/nl_NL/mls/medium/nl_NL-mls-medium.onnx.json
+  NL_VOICE_JSON_SHA256: 6ddb215d38f1392ab935ad45441b82ada1eeae0452a2d6849ed71ea4f2e0aa63
+
+jobs:
+  fetch-verify-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Download and verify every asset against its pinned SHA-256
+        run: |
+          mkdir -p dist
+          fetch() {
+            local url="$1" out="$2" expected="$3"
+            echo "Fetching $url"
+            curl -sSL --fail -o "dist/$out" "$url"
+            actual=$(sha256sum "dist/$out" | cut -d' ' -f1)
+            if [ "$actual" != "$expected" ]; then
+              echo "::error::$out checksum mismatch — expected $expected, got $actual"
+              exit 1
+            fi
+            echo "  OK: $out ($actual)"
+          }
+          fetch "$SHERPA_ONNX_URL" "sherpa-onnx-1.13.8.aar" "$SHERPA_ONNX_SHA256"
+          fetch "$EN_VOICE_ONNX_URL" "en_US-ryan-high.onnx" "$EN_VOICE_ONNX_SHA256"
+          fetch "$EN_VOICE_JSON_URL" "en_US-ryan-high.onnx.json" "$EN_VOICE_JSON_SHA256"
+          fetch "$NL_VOICE_ONNX_URL" "nl_NL-mls-medium.onnx" "$NL_VOICE_ONNX_SHA256"
+          fetch "$NL_VOICE_JSON_URL" "nl_NL-mls-medium.onnx.json" "$NL_VOICE_JSON_SHA256"
+          ls -la dist/
+
+      - name: Write a checksums manifest for the release page
+        run: |
+          cd dist
+          sha256sum * > CHECKSUMS.txt
+          cat CHECKSUMS.txt
+
+      - name: Publish the tts-assets-v1 release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          tag_name: tts-assets-v1
+          name: "TTS voice + runtime assets v1"
+          body: |
+            Mirrored, checksum-verified copies of the binaries Detour's on-device neural voice
+            feature depends on. Nothing here is built from this repo's own source — see each
+            source link for the original. This repo is public (unlike detour itself) so these
+            URLs are fetchable without authentication — see README.md.
+
+            - `sherpa-onnx-1.13.8.aar` — the sherpa-onnx Android runtime, Apache-2.0, from
+              [k2-fsa/sherpa-onnx v1.13.8](https://github.com/k2-fsa/sherpa-onnx/releases/tag/v1.13.8).
+              No Maven Central artifact exists for this; it's a local AAR dependency pinned to
+              this exact file.
+            - `en_US-ryan-high.onnx` / `.onnx.json` — English voice, MIT, from
+              [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices) (`en/en_US/ryan/high`).
+            - `nl_NL-mls-medium.onnx` / `.onnx.json` — Dutch voice, MIT, from the same source
+              (`nl/nl_NL/mls/medium`) — medium is the highest tier Piper currently publishes for
+              Dutch.
+            - `CHECKSUMS.txt` — SHA-256 of every file above, for anyone verifying by hand. Detour
+              itself pins these same values in code rather than trusting this file at runtime.
+
+            Fixed tag, not versioned per run — re-publish this workflow if a URL or checksum
+            ever needs to change. See `docs/PROJECT-STATE.md` in the detour repo for why these
+            specific voices and this specific runtime were chosen.
+          prerelease: true
+          files: |
+            dist/sherpa-onnx-1.13.8.aar
+            dist/en_US-ryan-high.onnx
+            dist/en_US-ryan-high.onnx.json
+            dist/nl_NL-mls-medium.onnx
+            dist/nl_NL-mls-medium.onnx.json
+            dist/CHECKSUMS.txt
