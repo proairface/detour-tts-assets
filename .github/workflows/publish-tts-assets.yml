@@ -55,6 +55,16 @@ env:
   ALEX_VOICE_ONNX_SHA256: 22f0497c4d895a09fbc6a469459aa8954ea0955d3c6e19dbcc2e23acbb93e30b
   ALEX_VOICE_JSON_URL: https://huggingface.co/rhasspy/piper-voices/resolve/main/nl/nl_NL/alex/medium/nl_NL-alex-medium.onnx.json
   ALEX_VOICE_JSON_SHA256: 9ea643871742c038511b6aaf20e6fc098a78a11968122d2f6ca3e50403423f95
+  # A second English option, alongside ryan-high (not a replacement — see README.md): one
+  # 904-speaker multi-speaker model, CC BY 4.0, trained from scratch on LibriTTS (OpenSLR/60) —
+  # no lessac-derived taint, cleaner than ryan-high's own unresolved NC question. Detour's
+  # VoiceOption.sharedAssetId lets three speaker picks (f3/m6/f9 below, chosen by ear from
+  # several rounds of random sampling — see docs/PROJECT-STATE.md in the detour repo) share this
+  # one file instead of each costing their own ~130 MB download.
+  LIBRITTS_VOICE_ONNX_URL: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/libritts/high/en_US-libritts-high.onnx
+  LIBRITTS_VOICE_ONNX_SHA256: 9127a559e11603f10b366d1a20ac7426826081dbc521de4c2420c57728d73f0f
+  LIBRITTS_VOICE_JSON_URL: https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/libritts/high/en_US-libritts-high.onnx.json
+  LIBRITTS_VOICE_JSON_SHA256: 2efdc6d7f954588b8180132cbd9b8001933fdd00932c92bc92fd0d2028a9eb3d
 
 jobs:
   fetch-verify-publish:
@@ -83,10 +93,15 @@ jobs:
           fetch "$PIM_VOICE_JSON_URL" "nl_NL-pim-medium.onnx.json" "$PIM_VOICE_JSON_SHA256"
           fetch "$ALEX_VOICE_ONNX_URL" "nl_NL-alex-medium.onnx" "$ALEX_VOICE_ONNX_SHA256"
           fetch "$ALEX_VOICE_JSON_URL" "nl_NL-alex-medium.onnx.json" "$ALEX_VOICE_JSON_SHA256"
+          fetch "$LIBRITTS_VOICE_ONNX_URL" "en_US-libritts-high.onnx" "$LIBRITTS_VOICE_ONNX_SHA256"
+          fetch "$LIBRITTS_VOICE_JSON_URL" "en_US-libritts-high.onnx.json" "$LIBRITTS_VOICE_JSON_SHA256"
           # Not fetched/verified against a URL — generated and committed directly, see the
           # workflow header comment.
           cp previews/nl_NL-pim-medium-preview.wav dist/
           cp previews/nl_NL-alex-medium-preview.wav dist/
+          cp previews/en_US-libritts-high-f3-preview.wav dist/
+          cp previews/en_US-libritts-high-m6-preview.wav dist/
+          cp previews/en_US-libritts-high-f9-preview.wav dist/
           ls -la dist/
 
       - name: Write a checksums manifest for the release page
@@ -101,7 +116,7 @@ jobs:
           tag_name: tts-assets-v1
           name: "TTS voice + runtime assets v1"
           body: |
-            Voice model files Detour's on-device neural voice feature depends on, plus two short
+            Voice model files Detour's on-device neural voice feature depends on, plus short
             preview clips for its voice-picker UI. See README.md for the full account of what's
             here and why.
 
@@ -112,8 +127,14 @@ jobs:
             - `nl_NL-pim-medium.onnx` / `.onnx.json` and `nl_NL-alex-medium.onnx` / `.onnx.json` —
               two single-speaker Dutch voices, CC0, from the same source (`nl/nl_NL/pim/medium`,
               `nl/nl_NL/alex/medium`). Both offered in the app; the driver picks.
-            - `nl_NL-pim-medium-preview.wav` / `nl_NL-alex-medium-preview.wav` — short (2-4s)
-              locally-generated preview clips, not mirrored from anywhere — see README.md.
+            - `en_US-libritts-high.onnx` / `.onnx.json` — a second English option, alongside
+              (not replacing) `ryan-high`: a 904-speaker model, CC BY 4.0, from the same source
+              (`en/en_US/libritts/high`). Detour offers 3 of its speakers as separate picker
+              entries that share this one file — see README.md.
+            - `nl_NL-pim-medium-preview.wav` / `nl_NL-alex-medium-preview.wav` /
+              `en_US-libritts-high-f3-preview.wav` / `en_US-libritts-high-m6-preview.wav` /
+              `en_US-libritts-high-f9-preview.wav` — short (2-4s) locally-generated preview
+              clips, not mirrored from anywhere — see README.md.
             - `CHECKSUMS.txt` — SHA-256 of every file above, for anyone verifying by hand. Detour
               itself pins these same values in code rather than trusting this file at runtime.
 
@@ -128,6 +149,11 @@ jobs:
             dist/nl_NL-pim-medium.onnx.json
             dist/nl_NL-alex-medium.onnx
             dist/nl_NL-alex-medium.onnx.json
+            dist/en_US-libritts-high.onnx
+            dist/en_US-libritts-high.onnx.json
             dist/nl_NL-pim-medium-preview.wav
             dist/nl_NL-alex-medium-preview.wav
+            dist/en_US-libritts-high-f3-preview.wav
+            dist/en_US-libritts-high-m6-preview.wav
+            dist/en_US-libritts-high-f9-preview.wav
             dist/CHECKSUMS.txt

@@ -33,12 +33,29 @@ exception is the two `previews/*.wav` clips, which are generated locally and com
   `pim` is also the exact voice
   [KotlinG2P](https://github.com/proairface/KotlinG2P)'s `DutchG2P` phonemizer was itself tuned
   and by-ear-verified against during its own development.
-- `nl_NL-pim-medium-preview.wav` / `nl_NL-alex-medium-preview.wav` — short (2-4 second) preview
-  clips for Detour's voice-picker UI, so a driver can hear a voice before committing to a ~60 MB
-  download of the real thing. **Not mirrored** — generated locally via a scratch `onnxruntime`
-  harness running the real `DutchG2P` phonemizer against these exact voice weights, then
-  committed straight into [`previews/`](previews/) in this repo. No upstream source or checksum
-  to verify these against; this repo *is* the source, same as any other committed file.
+- `en_US-libritts-high.onnx` / `.onnx.json` — a **second** English option, offered *alongside*
+  `ryan-high`, not a replacement for it (the app owner hasn't decided on `ryan-high`'s own
+  license question — see above). One 904-speaker Piper voice, **CC BY 4.0** (confirmed against
+  its own real `MODEL_CARD`), trained from scratch on LibriTTS (OpenSLR/60) — no `lessac`-derived
+  taint, a cleaner license than `ryan-high`'s. Same source (`en/en_US/libritts/high`). Detour
+  offers 3 of its 904 speakers as separate voice-picker entries — `f3` (`p6341`), `m6` (`p5239`),
+  `f9` (`p6206`) — picked by ear across several rounds of random sampling filtered to
+  LibriSpeech's cleaner training subsets (see `docs/PROJECT-STATE.md` in the detour repo for the
+  full selection method and the by-ear verdicts, including why a 4th candidate, `m9`, was
+  dropped). All 3 read the *same* `en_US-libritts-high.onnx`/`.onnx.json` pair, differing only by
+  the `sid` (speaker id) each sends to the ONNX graph at inference — Detour's
+  `VoiceOption.sharedAssetId` is what lets its `VoiceDownloadManager` download this one ~130 MB
+  file once and reuse it across all 3 picker entries, rather than a driver paying for the same
+  bytes three times over.
+- `nl_NL-pim-medium-preview.wav` / `nl_NL-alex-medium-preview.wav` /
+  `en_US-libritts-high-f3-preview.wav` / `en_US-libritts-high-m6-preview.wav` /
+  `en_US-libritts-high-f9-preview.wav` — short (2-4 second) preview clips for Detour's
+  voice-picker UI, so a driver can hear a voice before committing to the full download. **Not
+  mirrored** — generated locally via a scratch `onnxruntime` harness running the real `DutchG2P`/
+  `G2P` phonemizer against these exact voice weights (the LibriTTS previews with each speaker's
+  own `sid`), then committed straight into [`previews/`](previews/) in this repo. No upstream
+  source or checksum to verify these against; this repo *is* the source, same as any other
+  committed file.
 - `CHECKSUMS.txt` — SHA-256 of every file above.
 
 See the release page itself for the exact source links and checksums for the files actually
