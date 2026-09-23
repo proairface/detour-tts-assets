@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "voices": [
+    {
+      "id": "ryan",
+      "languageTag": "en",
+      "displayName": "Ryan",
+      "modelUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-ryan-high.onnx",
+      "modelSha256": "b3990d7606e183ec8dbfba70a4607074f162de1a0c412e0180d1ff60bb154eca",
+      "configUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-ryan-high.onnx.json",
+      "configSha256": "c6d3b98f08315cb4bebf0d49d50fc4ff491b503c64b940cd3d5ca28543b48011"
+    },
+    {
+      "id": "libritts-f3",
+      "languageTag": "en",
+      "displayName": "Grace",
+      "modelUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high.onnx",
+      "modelSha256": "9127a559e11603f10b366d1a20ac7426826081dbc521de4c2420c57728d73f0f",
+      "configUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high.onnx.json",
+      "configSha256": "2efdc6d7f954588b8180132cbd9b8001933fdd00932c92bc92fd0d2028a9eb3d",
+      "previewUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high-f3-preview.wav",
+      "previewSha256": "f426996fc526f4ef6be30fc5b66c999df6067234b71f20e882d88c281870bd89",
+      "speakerId": 218,
+      "sharedAssetId": "libritts-high"
+    },
+    {
+      "id": "libritts-m6",
+      "languageTag": "en",
+      "displayName": "Miles",
+      "modelUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high.onnx",
+      "modelSha256": "9127a559e11603f10b366d1a20ac7426826081dbc521de4c2420c57728d73f0f",
+      "configUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high.onnx.json",
+      "configSha256": "2efdc6d7f954588b8180132cbd9b8001933fdd00932c92bc92fd0d2028a9eb3d",
+      "previewUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high-m6-preview.wav",
+      "previewSha256": "4f96a10992ee2b195d80df67b88440847869f41508c95a253151f43a796b470e",
+      "speakerId": 243,
+      "sharedAssetId": "libritts-high"
+    },
+    {
+      "id": "libritts-f9",
+      "languageTag": "en",
+      "displayName": "Nora",
+      "modelUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high.onnx",
+      "modelSha256": "9127a559e11603f10b366d1a20ac7426826081dbc521de4c2420c57728d73f0f",
+      "configUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high.onnx.json",
+      "configSha256": "2efdc6d7f954588b8180132cbd9b8001933fdd00932c92bc92fd0d2028a9eb3d",
+      "previewUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/en_US-libritts-high-f9-preview.wav",
+      "previewSha256": "32273d2887a0acc8e847453601d61b841eb73c9795097efe9aff9f5f2018f82f",
+      "speakerId": 177,
+      "sharedAssetId": "libritts-high"
+    },
+    {
+      "id": "pim",
+      "languageTag": "nl",
+      "displayName": "Pim",
+      "modelUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/nl_NL-pim-medium.onnx",
+      "modelSha256": "403e58c3675c394f505c2428117bf34cc56e9542dcf6eadbdd3a84706c12e048",
+      "configUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/nl_NL-pim-medium.onnx.json",
+      "configSha256": "08b58456ca00cf77123826b1712758f99d5fd19ddfb7ec7da8e1a715b047f642",
+      "previewUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/nl_NL-pim-medium-preview.wav",
+      "previewSha256": "12e5baf98cd8c361941c5427140d095f26de70cb64d738a80326c88c7cdd5466"
+    },
+    {
+      "id": "alex",
+      "languageTag": "nl",
+      "displayName": "Alex",
+      "modelUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/nl_NL-alex-medium.onnx",
+      "modelSha256": "22f0497c4d895a09fbc6a469459aa8954ea0955d3c6e19dbcc2e23acbb93e30b",
+      "configUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/nl_NL-alex-medium.onnx.json",
+      "configSha256": "9ea643871742c038511b6aaf20e6fc098a78a11968122d2f6ca3e50403423f95",
+      "previewUrl": "https://github.com/proairface/detour-tts-assets/releases/download/tts-assets-v1/nl_NL-alex-medium-preview.wav",
+      "previewSha256": "7da56c139556038e1323b6a27a941eff932687bd660c2ecf49726eb166691cc4"
+    }
+  ]
+}
